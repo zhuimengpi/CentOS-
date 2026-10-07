@@ -27,7 +27,7 @@ LOG_FILE="$(dirname "$(readlink -f "$0")")/backup_cron.log"
 if [ $# -ne 1 ]
 then
 	echo "本脚本仅支持单个参数，请使用\"sh daily_archive.sh --help 进行参数查询\""
-	exit
+	exit 1
 fi
 
 # 2.参数类型匹配
@@ -87,6 +87,7 @@ fi
     echo "DAILY_TIME=\"$DAILY_TIME\""
     echo "DIR_PATH=\"$DIR_PATH\""
     echo "DIR_NAME=\"$DIR_NAME\""
+    echo "LOG_FILE=\"$LOG_FILE\""
 } > "$CONF_FILE"
 
 # ---------识别备份脚本----------
@@ -118,7 +119,7 @@ then
 	HOUR=${DAILY_TIME%%:*}
 	MINUTE=${DAILY_TIME##*:}
 	CRON_TIME="$MINUTE $HOUR * * *"
-	CRON_LINE="$CRON_TIME $WORK_SH $DIR_PATH $DIR_NAME >> $LOG_FILE 2>&1 $TAG"
+	CRON_LINE="$CRON_TIME $WORK_SH >> $LOG_FILE 2>&1 $TAG"
 
 	# 执行脚本、记录日志（同时删除旧任务，追加新任务）
 	( crontab -l 2>/dev/null | grep -v "$TAG"; echo "$CRON_LINE" ) | crontab -
